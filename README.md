@@ -37,7 +37,7 @@ Verify Prometheus is running: Open a web browser and access the Prometheus web i
 
 Install and configure Pushgateway: Follow the instructions in the official Prometheus Pushgateway documentation (https://www.devopsschool.com/blog/prometheus-pushgateway-installation-configuration-and-using-tutorials/) to install and configure the Pushgateway on your system.
 
-Push metrics to the Pushgateway: To push CPU and memory usage metrics to the Pushgateway, you can use the following example code snippets in NodeJS(). Make sure you have the child_process,fs,express, pidusage, prom-client, axios library installed
+Push metrics to the Pushgateway: To push CPU and memory usage metrics to the Pushgateway, you can use the following example code snippets in NodeJS. Make sure you have the child_process,fs,express, pidusage, prom-client, axios library installed
 
 ### NodeJS:
 
