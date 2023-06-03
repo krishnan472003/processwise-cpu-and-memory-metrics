@@ -1,50 +1,98 @@
-# processwise-cpu-and-memory-metrics
-The script uses the `child_process` module to execute a command or spawn a child process and then retrieves CPU and memory usage metrics for that process using the `pidusage` package. It then pushes these metrics to the Pushgateway for further processing and visualization.
 # How to capture memory and CPU usage information
-## Architecture:
->Prometheus Server: The main Prometheus server that collects and stores time series data. It regularly scrapes metrics from various targets to build a time series database.
-
->Pushgateway: This component receives metrics pushed by external jobs or processes that cannot be directly scraped by Prometheus. It acts as an intermediary, accepting metric data and exposing it as an HTTP endpoint for the Prometheus server to scrape.
-
->Jobs or Processes: This component is used to scrape data from the system and send to the pushgateway server using language of choice.
-
+### Description:
+Above program written is used for getting the cpu and memory data. This data is send to pushgateway api url which is then processed by pushgateway and it sends this data to prometheus server 
 ## Steps:
 
->>Download Prometheus: Go to the Prometheus official website (https://prometheus.io/) and download the latest stable version of Prometheus suitable for your operating system.
+### Prometheus
+> Download Prometheus: Go to (https://www.digitalocean.com/community/tutorials/how-to-install-prometheus-on-ubuntu-16-04) and download the latest stable version of Prometheus suitable for your operating system and configure it
 
->Extract the Prometheus package: Extract the downloaded Prometheus package to a directory of your choice.
+> After configuration run the following command to start the service and to check its status
+ 
+ ```
+ $ sudo systemctl start prometheus
+ ```
+ 
+  ```
+$ sudo systemctl status prometheus
+ ```
+ * make sure you have systemd to run this command
+ >> The status would be shown as active
+ 
+ #### Imporatant Points to consider for installation:
+ 
+ > Port Number the service is running on. Standard port Number is 9090
+ 
+ > Proper configuration of prometheus.yml and prometheus.service files
+ 
+ > 
+ 
+### Pushgateway
+Install Pushgateway and configure it and run the service at PORT 9091 
+(https://www.devopsschool.com/blog/prometheus-pushgateway-installation-configuration-and-using-tutorials/) 
 
->Configure Prometheus: Open the prometheus.yml configuration file located in the Prometheus directory. This file defines the scraping targets and other configuration options.
-
->Add Pushgateway as a target: In the scrape_configs section of the prometheus.yml file, add a new job to scrape metrics from the Pushgateway. Here's an example configuration:
-
-### yaml:
-``` 
-scrape_configs:
-  - job_name: 'pushgateway'
-    static_configs:
-      - targets: ['pushgateway:9091']
-```  
-*Replace 'pushgateway:9091' with the address and port where your Pushgateway is running. Save the prometheus.yml file.
-
-Start Prometheus: Run the Prometheus server using the following command:
-
-    $ sudo systemctl start prommetheus
-
-Make sure you navigate to the directory where Prometheus is installed before executing this command.
-
-Verify Prometheus is running: Open a web browser and access the Prometheus web interface by visiting (http://localhost:9090) You should see the Prometheus UI.
+### prometheus.yml:
 
 Install and configure Pushgateway: Follow the instructions in the official Prometheus Pushgateway documentation (https://www.devopsschool.com/blog/prometheus-pushgateway-installation-configuration-and-using-tutorials/) to install and configure the Pushgateway on your system.
 
-Push metrics to the Pushgateway: To push CPU and memory usage metrics to the Pushgateway, you can use the following example code snippets in NodeJS. Make sure you have the child_process,fs,express, pidusage, prom-client, axios library installed
+``` 
+# my global config
+global:
+  scrape_interval: 3s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 3s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+  - job_name: "pushgateway"
+    static_configs:
+      - targets: ["localhost:9091"] 
+``` 
+*Replace target:['localhost:9091'] with the address and port where your Pushgateway and prometheus is running respectively. Save the prometheus.yml file.
+
+
+Start Prometheus: Run the Prometheus server using the following command:
+
+```
+    $ sudo systemctl restart prometheus
+```
+```
+    $ sudo systemctl start pushgateway
+```
+```
+    $ sudo systemctl status prometheus
+```
+```
+    $ sudo systemctl status pushgateway
+```
+>both the services should be active
+
+
+Verify Prometheus is running: Open a web browser and access the Prometheus web interface by visiting (http://<Your-ip-or-localhost>:9090) You should see the Prometheus UI.
+
+
+Push metrics to the Pushgateway: To push CPU and memory usage metrics to the Pushgateway, you can use the following example code snippets in NodeJS . Make sure you have the child_process,fs,express, pidusage, prom-client, axios library installed
 
 ### NodeJS:
+
 
 ```
 npm install child_process fs express pidusage prom-client axios
 ```
-
-Visualize metrics: You can now use Grafana or other visualization tools to connect to Prometheus and create dashboards to visualize the collected metrics.
-
-Remember to adapt the steps according to your specific environment and requirements.
+ * Remember to change the localhost with the server ip where you want to run the service
