@@ -55,6 +55,9 @@ exec('ps -eo user,pid,comm', (error, stdout, stderr) => {
 
       } catch (error) {
         console.error(`Error fetching resource usage for PID ${process.pid}: ${error.message}`);
+        
+        cpuUsageGauge.labels(process.user, process.pid, process.name).set(0);
+        memoryUsageGauge.labels(process.user, process.pid, process.name).set(0);
       }
     }
 
