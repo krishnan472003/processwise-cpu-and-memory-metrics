@@ -96,3 +96,8 @@ Push metrics to the Pushgateway: To push CPU and memory usage metrics to the Pus
 npm install child_process fs express pidusage prom-client axios
 ```
  * Remember to change the localhost with the server ip where you want to run the service
+ 
+ ### Service is running on three ports 
+ > NodeJS:3001
+ > prometheus: 9090
+ > pushgateway: 9091
